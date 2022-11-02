@@ -14,7 +14,7 @@ object Utils {
   def computeFork(salaries: List[Int], min: Int, max: Int): List[Int] = {
     var result = List[Int]()
 
-    for ((elem, i) <- salaries.zipWithIndex) {
+    for ((elem, _) <- salaries.zipWithIndex) {
       if (elem < max && elem > min) {
         result = result :+ elem
       }
