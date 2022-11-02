@@ -42,9 +42,9 @@ object App {
     println("Размер премии:")
     val bonus = readLine.toFloat
     println("Компенсация питания:")
-    val nutritional_compensation = readLine.toInt
+    val eatBonus = readLine.toInt
 
-    println(s"ежемесячный оклад сотрудника после вычета налогов: ${Utils.computeSalary(salaryGross, bonus, nutritional_compensation)}")
+    println(s"ежемесячный оклад сотрудника после вычета налогов: ${Utils.computeSalary(salaryGross, bonus, eatBonus)}")
   }
 
   /*
