@@ -1,15 +1,17 @@
+package com.example
+
+import scala.io.StdIn.readLine
+
 object App {
+  var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
+
   def main(args: Array[String]): Unit = {
-    // a
+
     task_a
 
-    // b, c
-    val income = 1000
-    val bonus = 10
-    val nutritional_compensation = 200
-    var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
-    println(s"ежемесячный оклад сотрудника после вычета налогов: ${task_b(income, bonus, nutritional_compensation)}")
-    println(s"отклонение(в процентах) от среднего значения оклада на уровень всего отдела: ${task_c(income, bonus, nutritional_compensation, salaries)}")
+    task_b
+
+    task_c
 
     // d
     val tuple = task_d(salaries, List(5, 5, 5, -5, 5, -5))
@@ -44,7 +46,7 @@ object App {
     val hello = "Hello World!"
     println(hello.reverse)
     println(hello.toLowerCase())
-    println(hello.substring(0, hello.length - 1))
+    println(hello.replace("!", ""))
     println(hello + "and goodbye python!")
   }
 
@@ -53,9 +55,15 @@ object App {
     На вход вашей программе подается значение годового дохода до вычета налогов,
     размер премии – в процентах от годового дохода и компенсация питания.
    */
-  def task_b(income: Int, bonus: Int, nutritional_compensation: Int): Double = {
-    val month_total = income / 12 + income * (bonus / 100) / 12 + nutritional_compensation / 12
-    month_total * 0.77 // 13 % налог
+  def task_b() = {
+    println("Введите годовой доход:")
+    val salaryGross = readLine.toInt
+    println("Размер премии:")
+    val bonus = readLine.toFloat
+    println("Компенсация питания:")
+    val nutritional_compensation = readLine.toInt
+
+    println(s"ежемесячный оклад сотрудника после вычета налогов: ${Utils.compute_salary(salaryGross, bonus, nutritional_compensation)}")
   }
 
   /*
@@ -64,10 +72,19 @@ object App {
     в большую или меньшую сторону отклоняется размер оклада. На вход вышей программе подаются все значения,
     аналогичные предыдущей программе, а также список со значениями окладов сотрудников отдела 100, 150, 200, 80, 120, 75.
    */
-  def task_c(income: Int, bonus: Int, nutritional_compensation: Int, salaries: List[Int]): Double = {
-    val salary = task_b(income, bonus, nutritional_compensation)
-    val middleSalary = salaries.sum / salaries.length
-    100 - (100 * salary / middleSalary)
+  def task_c() = {
+
+    println("Введите годовой доход:")
+    val salaryGross = readLine.toInt
+    println("Размер премии:")
+    val bonus = readLine.toFloat
+    println("Компенсация питания:")
+    val nutritional_compensation = readLine.toInt
+
+    val salaryNet = Utils.compute_salary(salaryGross, bonus, nutritional_compensation)
+    val deviation = Utils.compute_deviation(salaryNet, salaries)
+
+    println(s"отклонение(в процентах) от среднего значения оклада на уровень всего отдела: $deviation")
   }
 
   /*
