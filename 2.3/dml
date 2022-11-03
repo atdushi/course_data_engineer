@@ -1,0 +1,31 @@
+-- Уникальный номер сотрудника, его ФИО и стаж работы – для всех сотрудников компании
+SELECT 
+	id, 
+	fullname, 
+	DATE_PART('year', now()) - DATE_PART('year', startdate) as experience
+FROM employees;
+
+-- Уникальный номер сотрудника, его ФИО и стаж работы – только первых 3-х сотрудников
+SELECT
+	id, 
+	fullname, 
+	DATE_PART('year', now()) - DATE_PART('year', startdate) as experience
+FROM employees
+LIMIT 3;
+
+-- Уникальный номер сотрудников - водителей
+SELECT
+	id
+FROM employees
+WHERE driverlicense;
+
+-- Выведите номера сотрудников, которые хотя бы за 1 квартал получили оценку D или E
+SELECT DISTINCT
+	employeeid
+FROM grades
+WHERE grade in ('D', 'E');
+
+-- Выведите самую высокую зарплату в компании.
+SELECT
+	MAX(salary)
+FROM employees;
