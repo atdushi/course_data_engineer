@@ -3,17 +3,26 @@ package com.example
 import scala.io.StdIn.readLine
 
 object App {
-  val salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
+  case class Employee(salaryGross: Int, bonus: Float, eatBonus: Int)
 
   def main(args: Array[String]): Unit = {
     task_a()
-    task_b()
-    task_c()
-    task_d()
-    task_e()
-    task_f()
-    task_g()
-    task_h()
+
+    var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
+
+    val employee = task_b()
+
+    task_c(employee, salaries)
+
+    salaries = task_d(employee.salaryGross, salaries)
+
+    salaries = task_e(salaries)
+
+    salaries = task_f(salaries)
+
+    task_g(salaries)
+
+    salaries = task_h(salaries)
   }
 
   /*
@@ -36,15 +45,18 @@ object App {
     На вход вашей программе подается значение годового дохода до вычета налогов,
     размер премии – в процентах от годового дохода и компенсация питания.
    */
-  def task_b(): Unit = {
+  def task_b(): Employee = {
     println("Введите годовой доход:")
     val salaryGross = readLine.toInt
-    println("Размер премии:")
+    println("Размер премии в процентах (типа 0.2):")
     val bonus = readLine.toFloat
     println("Компенсация питания:")
     val eatBonus = readLine.toInt
 
-    println(s"ежемесячный оклад сотрудника после вычета налогов: ${Utils.computeSalary(salaryGross, bonus, eatBonus)}")
+    println(s"Ежемесячный оклад сотрудника после вычета налогов: ${Utils.computeSalaryNet(salaryGross, bonus, eatBonus)}")
+
+    val employee = Employee(salaryGross, bonus, eatBonus)
+    employee
   }
 
   /*
@@ -53,13 +65,12 @@ object App {
     в большую или меньшую сторону отклоняется размер оклада. На вход вышей программе подаются все значения,
     аналогичные предыдущей программе, а также список со значениями окладов сотрудников отдела 100, 150, 200, 80, 120, 75.
    */
-  def task_c(): Unit = {
-    println("Введите годовой доход:")
-    val salaryGross = readLine.toInt
+  def task_c(employee: Employee, salaries: List[Int]): Double = {
+    val deviation = Utils.computeDeviationPercent(employee.salaryGross, salaries)
 
-    val deviation = Utils.computeDeviation(salaryGross, salaries)
+    println(s"Отклонение (в процентах) от среднего значения оклада на уровень всего отдела: $deviation")
 
-    println(s"отклонение(в процентах) от среднего значения оклада на уровень всего отдела: $deviation")
+    deviation
   }
 
   /*
@@ -67,38 +78,37 @@ object App {
     необходимую сумму с учетом результатов прошлого задания.
     Добавьте его зарплату в список и вычислите значение самой высокой зарплаты и самой низкой.
    */
-  def task_d(): Unit = {
-    val prevBonus = List(5, 5, 5, -5, 5, -5)
+  def task_d(salaryGross: Int, salaries: List[Int]): List[Int] = {
+    val salary = salaryGross + Utils.computeDeviation(salaryGross,salaries)
+    val result = salaries :+ salary
 
-    var result = List[Int]()
+    println(s"Новые зарплаты сотрудников: ${result.mkString(", ")}")
+    println(s"Минимальная зарплата: ${result.min}")
+    println(s"Максимальная зарплата: ${result.max}")
 
-    for ((elem, i) <- salaries.zipWithIndex) {
-      result = result :+ (elem + prevBonus.apply(i))
-    }
-
-    println(s"новая зарплата сотрудника: $result")
-    println(s"минимальная зарплата: ${result.min}")
-    println(s"максимальная зарплата: ${result.max}")
+    result
   }
 
   /*
     e. Также в вашу команду пришли два специалиста с окладами 350 и 90 тысяч рублей.
     Попробуйте отсортировать список сотрудников по уровню оклада от меньшего к большему.
    */
-  def task_e(): Unit = {
+  def task_e(salaries: List[Int]): List[Int] = {
     var result = salaries
     result = salaries :+ 350
     result = salaries :+ 90
     result = result.sorted
 
-    println(s"список сотрудников по уровню оклада от меньшего к большему: ${result.mkString(", ")}")
+    println(s"Список сотрудников по уровню оклада от меньшего к большему: ${result.mkString(", ")}")
+
+    salaries
   }
 
   /*
     f.  Кажется, вы взяли в вашу команду еще одного сотрудника и предложили ему оклад 130 тысяч.
     Вычислите самостоятельно номер сотрудника в списке так, чтобы сортировка не нарушилась и добавьте его на это место.
    */
-  def task_f(): Unit = {
+  def task_f(salaries: List[Int]): List[Int] = {
     var j = 0
     val salary = 130
 
@@ -110,31 +120,41 @@ object App {
 
     val result = salaries.take(j + 1) ++ List(salary) ++ salaries.drop(j + 1)
 
-    println(s"с новым сотрудник с зарплатой 130 тысяч: ${result.mkString(", ")}")
+    println(s"С новым сотрудником с зарплатой 130 тысяч: ${result.mkString(", ")}")
+
+    result
   }
 
   /*
     g. Попробуйте вывести номера сотрудников из полученного списка, которые попадают под категорию middle.
     На входе программе подается «вилка» зарплаты специалистов уровня middle.
    */
-  def task_g(): Unit = {
+  def task_g(salaries: List[Int]): Unit = {
     println("Введите верхнюю границу для зарплаты middle:")
     val min = readLine().toInt
     println("Введите нижнюю границу для зарплаты middle:")
     val max = readLine().toInt
 
-    println(s"специалисты уровня middle: ${Utils.computeFork(salaries, min, max).mkString(", ")}")
+    println(s"Специалисты уровня middle: ${Utils.computeFork(salaries, min, max).mkString(", ")}")
   }
 
   /*
     h. Однако наступил кризис и ваши сотрудники требуют повысить зарплату.
     Вам необходимо проиндексировать зарплату каждого сотрудника на уровень инфляции – 7%
    */
-  def task_h(): Unit = {
-    println(s"старая зарплата: ${salaries.mkString(", ")}")
+  def task_h(salaries: List[Int]): List[Int] = {
+    println(s"Старая зарплата: ${salaries.mkString(", ")}")
 
     val inflation = 0.07f
+    var result: List[Int] = Nil
 
-    println(s"проиндексированная зарплата: ${Utils.indexSalary(salaries, inflation).mkString(", ")}")
+    // округлим для красоты
+    for (elem <- Utils.indexSalary(salaries, inflation)) {
+      result = result :+ elem.round.toInt
+    }
+
+    println(s"Проиндексированная зарплата: ${result.mkString(", ")}")
+
+    result
   }
 }

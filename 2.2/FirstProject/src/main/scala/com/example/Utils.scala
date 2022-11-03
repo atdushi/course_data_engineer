@@ -1,14 +1,20 @@
 package com.example
 
 object Utils {
-  def computeSalary(salaryGross: Int, bonus: Float, eatBonus: Int): Double = {
+  def computeSalaryNet(salaryGross: Int, bonus: Float, eatBonus: Int): Double = {
     // 13 % налог
     (salaryGross + salaryGross * bonus + eatBonus) * 0.87 / 12
   }
 
-  def computeDeviation(salaryGross: Int, salaries: List[Int]): Double = {
+  def computeDeviationPercent(salaryGross: Int, salaries: List[Int]): Double = {
     val middleSalary = salaries.sum / salaries.length
-    100 - (100 * salaryGross / middleSalary)
+    var deviation: Double = 100 - (100 * salaryGross / middleSalary)
+    -deviation / 100
+  }
+
+  def computeDeviation(salaryGross: Int, salaries: List[Int]): Int = {
+    val middleSalary = salaries.sum / salaries.length
+    middleSalary - salaryGross
   }
 
   def computeFork(salaries: List[Int], min: Int, max: Int): List[Int] = {
