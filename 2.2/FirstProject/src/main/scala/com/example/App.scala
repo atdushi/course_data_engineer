@@ -6,23 +6,26 @@ object App {
   case class Employee(salaryGross: Int, bonus: Float, eatBonus: Int)
 
   def main(args: Array[String]): Unit = {
-    task_a()
+
+    // Версия Lite
+
+    taskA()
 
     var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
 
-    val employee = task_b()
+    val employee = taskB()
 
-    task_c(employee, salaries)
+    taskC(employee, salaries)
 
-    salaries = task_d(employee.salaryGross, salaries)
+    salaries = taskD(employee.salaryGross, salaries)
 
-    salaries = task_e(salaries)
+    salaries = taskE(salaries)
 
-    salaries = task_f(salaries)
+    salaries = taskF(salaries)
 
-    task_g(salaries)
+    taskG(salaries)
 
-    salaries = task_h(salaries)
+    salaries = taskH(salaries)
   }
 
   /*
@@ -32,7 +35,7 @@ object App {
      iii. удаляет символ!
      iv.  добавляет в конец фразы «and goodbye python!»
    */
-  def task_a(): Unit = {
+  def taskA(): Unit = {
     val hello = "Hello World!"
     println(hello.reverse)
     println(hello.toLowerCase())
@@ -45,7 +48,7 @@ object App {
     На вход вашей программе подается значение годового дохода до вычета налогов,
     размер премии – в процентах от годового дохода и компенсация питания.
    */
-  def task_b(): Employee = {
+  def taskB(): Employee = {
     println("Введите годовой доход:")
     val salaryGross = readLine.toInt
     println("Размер премии в процентах (типа 0.2):")
@@ -65,7 +68,7 @@ object App {
     в большую или меньшую сторону отклоняется размер оклада. На вход вышей программе подаются все значения,
     аналогичные предыдущей программе, а также список со значениями окладов сотрудников отдела 100, 150, 200, 80, 120, 75.
    */
-  def task_c(employee: Employee, salaries: List[Int]): Double = {
+  def taskC(employee: Employee, salaries: List[Int]): Double = {
     val deviation = Utils.computeDeviationPercent(employee.salaryGross, salaries)
 
     println(s"Отклонение (в процентах) от среднего значения оклада на уровень всего отдела: $deviation")
@@ -78,7 +81,7 @@ object App {
     необходимую сумму с учетом результатов прошлого задания.
     Добавьте его зарплату в список и вычислите значение самой высокой зарплаты и самой низкой.
    */
-  def task_d(salaryGross: Int, salaries: List[Int]): List[Int] = {
+  def taskD(salaryGross: Int, salaries: List[Int]): List[Int] = {
     val salary = salaryGross + Utils.computeDeviation(salaryGross,salaries)
     val result = salaries :+ salary
 
@@ -93,7 +96,7 @@ object App {
     e. Также в вашу команду пришли два специалиста с окладами 350 и 90 тысяч рублей.
     Попробуйте отсортировать список сотрудников по уровню оклада от меньшего к большему.
    */
-  def task_e(salaries: List[Int]): List[Int] = {
+  def taskE(salaries: List[Int]): List[Int] = {
     var result = salaries
     result = salaries :+ 350
     result = salaries :+ 90
@@ -108,7 +111,7 @@ object App {
     f.  Кажется, вы взяли в вашу команду еще одного сотрудника и предложили ему оклад 130 тысяч.
     Вычислите самостоятельно номер сотрудника в списке так, чтобы сортировка не нарушилась и добавьте его на это место.
    */
-  def task_f(salaries: List[Int]): List[Int] = {
+  def taskF(salaries: List[Int]): List[Int] = {
     var j = 0
     val salary = 130
 
@@ -129,7 +132,7 @@ object App {
     g. Попробуйте вывести номера сотрудников из полученного списка, которые попадают под категорию middle.
     На входе программе подается «вилка» зарплаты специалистов уровня middle.
    */
-  def task_g(salaries: List[Int]): Unit = {
+  def taskG(salaries: List[Int]): Unit = {
     println("Введите верхнюю границу для зарплаты middle:")
     val min = readLine().toInt
     println("Введите нижнюю границу для зарплаты middle:")
@@ -142,7 +145,7 @@ object App {
     h. Однако наступил кризис и ваши сотрудники требуют повысить зарплату.
     Вам необходимо проиндексировать зарплату каждого сотрудника на уровень инфляции – 7%
    */
-  def task_h(salaries: List[Int]): List[Int] = {
+  def taskH(salaries: List[Int]): List[Int] = {
     println(s"Старая зарплата: ${salaries.mkString(", ")}")
 
     val inflation = 0.07f
