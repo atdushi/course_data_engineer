@@ -1,0 +1,32 @@
+services:
+    postgres_service:
+        container_name: postgres_14
+        image: postgres:14.2
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+        env_file:
+            - .env
+        networks:
+            - pg_network
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}			
+        restart: always
+    pgadmin_service:
+        container_name: pgadmin4
+        image: truecharts/pgadmin4
+        env_file:
+            - .env
+        ports:
+            - "5051:80"
+        networks:
+            - pg_network
+        environment:
+            - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+            - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+
+networks:
+    pg_network:
+        name: "pg_network"
+        driver: bridge
