@@ -41,41 +41,34 @@ CREATE TABLE IF NOT EXISTS de_sprint.grades (
     	ON DELETE CASCADE
 );
 
-INSERT INTO de_sprint.departments(id, title, director, amount) VALUES (1, 'Бухгалтерия', 'Сафонова Алина Григорьевна', 1);
-INSERT INTO de_sprint.departments(id, title, director, amount) VALUES (2, 'IT', 'Крючков Фёдор Артёмович', 4);
 
-INSERT INTO de_sprint.employees(
-	id, full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
-	VALUES (1, 'Сафонова Алина Григорьевна', '1990-01-08', '2008-01-08', 'Бухгалтер', 'lead', 
-			50000, 1, true);
-			
-INSERT INTO de_sprint.employees(
-	id, full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
-	VALUES (2, 'Антонов Евгений Артёмович', '1991-02-09', '2009-05-18', 'Программист', 'junior', 
-			80000, 2, false);
+INSERT INTO 
+	de_sprint.departments(id, title, director, amount) 
+VALUES 
+	(1, 'Бухгалтерия', 'Сафонова Алина Григорьевна', 1),
+	(2, 'IT', 'Крючков Фёдор Артёмович', 4);
 
-INSERT INTO de_sprint.employees(
-	id, full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
-	VALUES (3, 'Седов Антон Борисович', '1992-05-11', '2015-01-08', 'Программист', 'middle', 
-			100000, 2, true);
+
+INSERT INTO 
+	de_sprint.employees(id, full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
+VALUES 
+	(1, 'Сафонова Алина Григорьевна', '1990-01-08', '2008-01-08', 'Бухгалтер', 'lead', 50000, 1, true),
+	(2, 'Антонов Евгений Артёмович', '1991-02-09', '2009-05-18', 'Программист', 'junior', 80000, 2, false),
+	(3, 'Седов Антон Борисович', '1992-05-11', '2015-01-08', 'Программист', 'middle', 100000, 2, true),
+	(4, 'Титова Ульяна Тимофеевна', '1993-01-08', '2020-01-22', 'Программист', 'senior', 110000, 2, false),
+	(5, 'Крючков Фёдор Артёмович', '1994-10-08', '2000-05-26', 'Программист', 'lead', 130000, 2, true);
 			
-INSERT INTO de_sprint.employees(
-	id, full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
-	VALUES (4, 'Титова Ульяна Тимофеевна', '1993-01-08', '2020-01-22', 'Программист', 'senior', 
-			110000, 2, false);
-			
-INSERT INTO de_sprint.employees(
-	id, full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
-	VALUES (5, 'Крючков Фёдор Артёмович', '1994-10-08', '2000-05-26', 'Программист', 'lead', 
-			130000, 2, true);
-			
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (1, 1, 'A');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (1, 2, 'B');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (2, 1, 'E');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (2, 2, 'C');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (3, 1, 'B');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (3, 2, 'D');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (4, 1, 'A');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (4, 2, 'C');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (5, 1, 'E');
-INSERT INTO de_sprint.grades(employee_id, quarter, grade) VALUES (5, 2, 'D');
+
+INSERT INTO 
+	de_sprint.grades(employee_id, quarter, grade)
+VALUES 
+	(1, 1, 'A'),
+	(1, 2, 'B'),
+	(2, 1, 'E'),
+	(2, 2, 'C'),
+	(3, 1, 'B'),
+	(3, 2, 'D'),
+	(4, 1, 'A'),
+	(4, 2, 'C'),
+	(5, 1, 'E'),
+	(5, 2, 'D');
