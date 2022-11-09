@@ -1,8 +1,16 @@
 CREATE SCHEMA IF NOT EXISTS de_sprint;
 
-CREATE TYPE de_sprint.level AS ENUM ('junior', 'middle', 'senior', 'lead');
+CREATE TYPE de_sprint.level_type AS ENUM ('junior', 'middle', 'senior', 'lead');
 
-CREATE TYPE de_sprint.grade AS ENUM ('A', 'B', 'C', 'D', 'E');
+CREATE TYPE de_sprint.grade_type AS ENUM ('A', 'B', 'C', 'D', 'E');
+
+CREATE TABLE IF NOT EXISTS de_sprint.departments(
+    id serial primary key,
+    title TEXT NOT NULL UNIQUE,
+    director TEXT NOT NULL,
+    amount smallint DEFAULT 0,
+    created_at timestamptz DEFAULT NOW()
+);
 
 CREATE TABLE IF NOT EXISTS de_sprint.employees(
     id serial primary key,
@@ -10,28 +18,27 @@ CREATE TABLE IF NOT EXISTS de_sprint.employees(
     birthdate DATE,
     start_date DATE NOT NULL,
     position TEXT NOT NULL,
-    level de_sprint.level NOT NULL,
+    level de_sprint.level_type NOT NULL,
     salary FLOAT,
     department_id int,
     driver_license boolean DEFAULT FALSE,
     created_at timestamptz DEFAULT NOW(),
-    updated_at timestamptz DEFAULT NOW()
+    updated_at timestamptz DEFAULT NOW(),
+    CONSTRAINT department_fk
+    	FOREIGN KEY (department_id)
+    	REFERENCES de_sprint.departments(id)
+    	ON DELETE CASCADE
 );
-
-CREATE TABLE IF NOT EXISTS de_sprint.departments(
-    id serial primary key,
-    title TEXT NOT NULL UNIQUE,
-    director TEXT NOT NULL,
-    amount int DEFAULT 0,
-    created_at timestamptz DEFAULT NOW()
-);
-
 
 CREATE TABLE IF NOT EXISTS de_sprint.grades (
     employee_id int NOT NULL,
-    quarter int,
-    grade de_sprint.grade NOT NULL,
-    created_at timestamptz DEFAULT NOW()
+    quarter smallint,
+    grade de_sprint.grade_type NOT NULL,
+    created_at timestamptz DEFAULT NOW(),
+    CONSTRAINT employee_fk
+    	FOREIGN KEY (employee_id)
+    	REFERENCES de_sprint.employees(id)
+    	ON DELETE CASCADE
 );
 
 INSERT INTO de_sprint.departments(id, title, director, amount) VALUES (1, 'Бухгалтерия', 'Сафонова Алина Григорьевна', 1);
