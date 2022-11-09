@@ -5,7 +5,7 @@ CREATE TYPE de_sprint.level_type AS ENUM ('junior', 'middle', 'senior', 'lead');
 CREATE TYPE de_sprint.grade_type AS ENUM ('A', 'B', 'C', 'D', 'E');
 
 CREATE TABLE IF NOT EXISTS de_sprint.departments(
-    id serial primary key,
+    id INT GENERATED ALWAYS AS IDENTITY primary key,
     title TEXT NOT NULL UNIQUE,
     director TEXT NOT NULL,
     amount smallint DEFAULT 0,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS de_sprint.departments(
 );
 
 CREATE TABLE IF NOT EXISTS de_sprint.employees(
-    id serial primary key,
+    id INT GENERATED ALWAYS AS IDENTITY primary key,
     full_name TEXT NOT NULL,
     birthdate DATE,
     start_date DATE NOT NULL,
@@ -43,20 +43,20 @@ CREATE TABLE IF NOT EXISTS de_sprint.grades (
 
 
 INSERT INTO 
-	de_sprint.departments(id, title, director, amount) 
+	de_sprint.departments(title, director, amount) 
 VALUES 
-	(1, 'Бухгалтерия', 'Сафонова Алина Григорьевна', 1),
-	(2, 'IT', 'Крючков Фёдор Артёмович', 4);
+	('Бухгалтерия', 'Сафонова Алина Григорьевна', 1),
+	('IT', 'Крючков Фёдор Артёмович', 4);
 
 
 INSERT INTO 
-	de_sprint.employees(id, full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
+	de_sprint.employees(full_name, birthdate, start_date, "position", level, salary, department_id, driver_license)
 VALUES 
-	(1, 'Сафонова Алина Григорьевна', '1990-01-08', '2008-01-08', 'Бухгалтер', 'lead', 50000, 1, true),
-	(2, 'Антонов Евгений Артёмович', '1991-02-09', '2009-05-18', 'Программист', 'junior', 80000, 2, false),
-	(3, 'Седов Антон Борисович', '1992-05-11', '2015-01-08', 'Программист', 'middle', 100000, 2, true),
-	(4, 'Титова Ульяна Тимофеевна', '1993-01-08', '2020-01-22', 'Программист', 'senior', 110000, 2, false),
-	(5, 'Крючков Фёдор Артёмович', '1994-10-08', '2000-05-26', 'Программист', 'lead', 130000, 2, true);
+	('Сафонова Алина Григорьевна', '1990-01-08', '2008-01-08', 'Бухгалтер', 'lead', 50000, 1, true),
+	('Антонов Евгений Артёмович', '1991-02-09', '2009-05-18', 'Программист', 'junior', 80000, 2, false),
+	('Седов Антон Борисович', '1992-05-11', '2015-01-08', 'Программист', 'middle', 100000, 2, true),
+	('Титова Ульяна Тимофеевна', '1993-01-08', '2020-01-22', 'Программист', 'senior', 110000, 2, false),
+	('Крючков Фёдор Артёмович', '1994-10-08', '2000-05-26', 'Программист', 'lead', 130000, 2, true);
 			
 
 INSERT INTO 
