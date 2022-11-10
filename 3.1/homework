@@ -1,0 +1,44 @@
+# Virtualbox shared folder permissions
+sudo usermod -aG vboxsf cloudera
+
+hadoop fs -copyFromLocal /mnt/Downloads/voyna-i-mir-tom-1.txt /user/cloudera
+
+hadoop fs -copyFromLocal /mnt/Downloads/voyna-i-mir-tom-2.txt /user/cloudera
+
+hadoop fs -copyFromLocal /mnt/Downloads/voyna-i-mir-tom-3.txt /user/cloudera
+
+hadoop fs -copyFromLocal /mnt/Downloads/voyna-i-mir-tom-4.txt /user/cloudera
+
+hadoop fs -ls /user/cloudera
+Found 4 items
+-rw-r--r--   1 cloudera cloudera     736519 2022-11-10 06:48 /user/cloudera/voyna-i-mir-tom-1.txt
+-rw-r--r--   1 cloudera cloudera     770324 2022-11-10 06:50 /user/cloudera/voyna-i-mir-tom-2.txt
+-rw-r--r--   1 cloudera cloudera     843205 2022-11-10 06:50 /user/cloudera/voyna-i-mir-tom-3.txt
+-rw-r--r--   1 cloudera cloudera     697960 2022-11-10 06:50 /user/cloudera/voyna-i-mir-tom-4.txt
+
+hadoop fs -getmerge -nl /user/cloudera /mnt/Downloads/voyna-i-mir.txt
+
+hadoop fs -put /mnt/Downloads/voyna-i-mir.txt /user/cloudera
+
+hadoop fs -chmod 755 /user/cloudera/voyna-i-mir.txt
+
+hadoop fs -ls /user/cloudera
+Found 5 items
+-rw-r--r--   1 cloudera cloudera     736519 2022-11-10 06:48 /user/cloudera/voyna-i-mir-tom-1.txt
+-rw-r--r--   1 cloudera cloudera     770324 2022-11-10 06:50 /user/cloudera/voyna-i-mir-tom-2.txt
+-rw-r--r--   1 cloudera cloudera     843205 2022-11-10 06:50 /user/cloudera/voyna-i-mir-tom-3.txt
+-rw-r--r--   1 cloudera cloudera     697960 2022-11-10 06:50 /user/cloudera/voyna-i-mir-tom-4.txt
+-rwxr-xr-x   1 cloudera cloudera    3048012 2022-11-10 07:17 /user/cloudera/voyna-i-mir.txt
+
+hadoop fs -du -h /user/cloudera/voyna-i-mir.txt
+2.9 M  2.9 M  /user/cloudera/voyna-i-mir.txt
+
+hadoop fs -setrep -R 2 /user/cloudera/voyna-i-mir.txt
+
+hadoop fs -du -h /user/cloudera/voyna-i-mir.txt
+2.9 M  5.8 M  /user/cloudera/voyna-i-mir.txt
+
+hadoop fs -cat /user/cloudera/voyna-i-mir.txt | wc -w
+131299
+
+
