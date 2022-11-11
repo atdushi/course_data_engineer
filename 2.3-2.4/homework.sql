@@ -1,4 +1,4 @@
-------------------------------- 2.3 Версия Lite -------------------------------
+------------------------------- 2.3 -------------------------------
 
 -- Уникальный номер сотрудника, его ФИО и стаж работы – для всех сотрудников компании
 SELECT 
@@ -34,7 +34,69 @@ SELECT
 	MAX(salary)
 FROM de_sprint.employees;
 
-------------------------------- 2.4 Версия Lite -------------------------------
+--* Выведите название самого крупного отдела
+SELECT
+	title
+FROM
+	de_sprint.departments
+WHERE
+	amount = (
+	SELECT
+		max(amount)
+	FROM
+		de_sprint.departments);
+
+--* Выведите номера сотрудников от самых опытных до вновь прибывших
+SELECT
+	id
+FROM
+	de_sprint.employees
+ORDER BY
+	CURRENT_DATE-start_date DESC;
+		
+--* Рассчитайте среднюю зарплату для каждого уровня сотрудников
+SELECT
+	"level",
+	avg(salary)
+FROM
+	de_sprint.employees
+GROUP BY
+	"level";
+	
+/*
+* Добавьте столбец с информацией о коэффициенте годовой премии к основной таблице. Коэффициент рассчитывается по такой схеме: базовое значение коэффициента – 1, каждая оценка действует на коэффициент так:
+	· Е – минус 20%
+	· D – минус 10%
+	· С – без изменений
+	· B – плюс 10%
+	· A – плюс 20%
+*/
+WITH aux AS 
+(
+SELECT
+	employee_id,
+	1 + sum(
+	CASE
+		WHEN grade = 'A' THEN 0.2
+		WHEN grade = 'B' THEN 0.1
+		WHEN grade = 'D' THEN -0.1
+		WHEN grade = 'E' THEN -0.2
+		ELSE 0.0
+	END) AS coefficient
+FROM
+	de_sprint.grades
+GROUP BY
+	employee_id)
+SELECT
+	e.*,
+	a.coefficient
+FROM
+	de_sprint.employees e
+JOIN aux a ON
+	e.id = a.employee_id;
+
+	
+------------------------------- 2.4 -------------------------------
 
 -- a. Попробуйте вывести не просто самую высокую зарплату во всей команде, а вывести именно фамилию сотрудника с самой высокой зарплатой.
 SELECT
@@ -79,4 +141,93 @@ JOIN (
 JOIN de_sprint.departments dep on dep.id = d.department_id
 WHERE d.salary = e.salary
 GROUP BY dep.title, e.full_name, d.salary;
+
+-- f. *Выведите название отдела, сотрудники которого получат наибольшую премию по итогам года. Как рассчитать премию можно узнать в последнем задании предыдущей домашней работы
+WITH grade_aux AS 
+(
+SELECT
+	employee_id,
+	1 + sum(
+	CASE
+		WHEN grade = 'A' THEN 0.2
+		WHEN grade = 'B' THEN 0.1
+		WHEN grade = 'D' THEN -0.1
+		WHEN grade = 'E' THEN -0.2
+		ELSE 0.0
+	END) AS coefficient
+FROM
+	de_sprint.grades
+GROUP BY
+	employee_id),
+employee_aux AS 
+(
+SELECT
+	employee_id
+FROM
+	grade_aux
+WHERE
+	coefficient = (
+	SELECT
+		max(coefficient)
+	FROM
+		grade_aux) 
+)
+SELECT
+	d.title
+FROM
+	de_sprint.departments d
+WHERE
+	d.id =
+(
+	SELECT
+		e.department_id
+	FROM
+		de_sprint.employees e
+	WHERE
+		e.id = (
+		SELECT
+			employee_id
+		FROM
+			employee_aux)
+
+)
+
+-- g. *Проиндексируйте зарплаты сотрудников с учетом коэффициента премии. Для сотрудников с коэффициентом премии больше 1.2 – размер индексации составит 20%, для сотрудников с коэффициентом премии от 1 до 1.2 размер индексации составит 10%. Для всех остальных сотрудников индексация не предусмотрена.
+WITH grade_aux AS 
+(
+SELECT
+	employee_id,
+	1 + sum(
+	CASE
+		WHEN grade = 'A' THEN 0.2
+		WHEN grade = 'B' THEN 0.1
+		WHEN grade = 'D' THEN -0.1
+		WHEN grade = 'E' THEN -0.2
+		ELSE 0.0
+	END) AS coefficient
+FROM
+	de_sprint.grades
+GROUP BY
+	employee_id)
+SELECT
+	id,
+	full_name,
+	birthdate,
+	start_date,
+	"position",
+	"level",
+	department_id,
+	driver_license,
+	CASE 
+		WHEN coefficient > 1.2 THEN 1.2 * salary
+		WHEN coefficient < 1.2
+		AND coefficient > 1 THEN 1.1 * salary
+		ELSE salary
+	END salary	
+FROM
+	de_sprint.employees e
+JOIN grade_aux g ON
+	e.id = g.employee_id;
+
+
 
