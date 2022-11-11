@@ -82,14 +82,14 @@ SELECT
 		WHEN grade = 'D' THEN -0.1
 		WHEN grade = 'E' THEN -0.2
 		ELSE 0.0
-	END) AS coefficient
+	END) AS bonus_score
 FROM
 	de_sprint.grades
 GROUP BY
 	employee_id)
 SELECT
 	e.*,
-	a.coefficient
+	a.bonus_score
 FROM
 	de_sprint.employees e
 JOIN aux a ON
@@ -154,7 +154,7 @@ SELECT
 		WHEN grade = 'D' THEN -0.1
 		WHEN grade = 'E' THEN -0.2
 		ELSE 0.0
-	END) AS coefficient
+	END) AS bonus_score
 FROM
 	de_sprint.grades
 GROUP BY
@@ -166,9 +166,9 @@ SELECT
 FROM
 	grade_aux
 WHERE
-	coefficient = (
+	bonus_score = (
 	SELECT
-		max(coefficient)
+		max(bonus_score)
 	FROM
 		grade_aux) 
 )
@@ -204,11 +204,12 @@ SELECT
 		WHEN grade = 'D' THEN -0.1
 		WHEN grade = 'E' THEN -0.2
 		ELSE 0.0
-	END) AS coefficient
+	END) AS bonus_score
 FROM
 	de_sprint.grades
 GROUP BY
-	employee_id)
+	employee_id),
+employees_aux AS (
 SELECT
 	id,
 	full_name,
@@ -218,16 +219,227 @@ SELECT
 	"level",
 	department_id,
 	driver_license,
+	salary,
+	g.bonus_score,
 	CASE 
-		WHEN coefficient > 1.2 THEN 1.2 * salary
-		WHEN coefficient < 1.2
-		AND coefficient > 1 THEN 1.1 * salary
+		WHEN bonus_score > 1.2 THEN 1.2 * salary
+		WHEN bonus_score < 1.2
+		AND bonus_score > 1 THEN 1.1 * salary
 		ELSE salary
-	END salary	
+	END salary_indexed
 FROM
 	de_sprint.employees e
 JOIN grade_aux g ON
-	e.id = g.employee_id;
+	e.id = g.employee_id)
+	SELECT
+	-- i.     Название отдела
+	title,
+	-- ii.     Фамилию руководителя
+	director,
+	-- iii.     Количество сотрудников
+	amount,
+	-- iv.     Средний стаж
+	(
+	SELECT
+		avg(DATE_PART('year', now()) - DATE_PART('year', start_date)) AS avg_experience
+	FROM
+		de_sprint.employees e
+	WHERE
+		e.department_id = d.id
+	GROUP BY
+		e.department_id) avg_experience,
+	-- v.     Средний уровень зарплаты
+	(
+	SELECT
+		avg(salary) AS avg_salary
+	FROM
+		de_sprint.employees e
+	WHERE
+		e.department_id = d.id
+	GROUP BY
+		e.department_id) avg_salary,
+	-- vi.     Количество сотрудников уровня junior
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.employees e
+	WHERE
+		e.department_id = d.id
+		AND "level" = 'junior'
+	GROUP BY
+		e.department_id) cnt_junior,
+	-- vii.     Количество сотрудников уровня middle
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.employees e
+	WHERE
+		e.department_id = d.id
+		AND "level" = 'middle'
+	GROUP BY
+		e.department_id) cnt_middle,
+	-- viii.     Количество сотрудников уровня senior
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.employees e
+	WHERE
+		e.department_id = d.id
+		AND "level" = 'senior'
+	GROUP BY
+		e.department_id) cnt_senior,
+	-- ix.     Количество сотрудников уровня lead
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.employees e
+	WHERE
+		e.department_id = d.id
+		AND "level" = 'lead'
+	GROUP BY
+		e.department_id) cnt_lead,
+	-- x.     Общий размер оплаты труда всех сотрудников до индексации
+	(
+	SELECT
+		sum(salary)
+	FROM
+		employees_aux e
+	WHERE
+		e.department_id = d.id
+	GROUP BY
+		e.department_id) salary_total,
+	--xi.     Общий размер оплаты труда всех сотрудников после индексации
+	(
+	SELECT
+		sum(salary_indexed)
+	FROM
+		employees_aux e
+	WHERE
+		e.department_id = d.id
+	GROUP BY
+		e.department_id) salary_indexed_total,
+	-- xii.     Общее количество оценок А
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.grades g
+	JOIN de_sprint.employees e ON
+		e.id = g.employee_id
+	WHERE
+		e.department_id = d.id
+		AND grade = 'A'
+	) a_count,
+	-- xiii.     Общее количество оценок B
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.grades g
+	JOIN de_sprint.employees e ON
+		e.id = g.employee_id
+	WHERE
+		e.department_id = d.id
+		AND grade = 'B'
+	) b_count,
+	-- xiv.     Общее количество оценок C
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.grades g
+	JOIN de_sprint.employees e ON
+		e.id = g.employee_id
+	WHERE
+		e.department_id = d.id
+		AND grade = 'C'
+	) c_count,
+	-- xv.     Общее количество оценок D
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.grades g
+	JOIN de_sprint.employees e ON
+		e.id = g.employee_id
+	WHERE
+		e.department_id = d.id
+		AND grade = 'D'
+	) d_count,
+	-- xvi.     Общее количество оценок Е
+	(
+	SELECT
+		count(1)
+	FROM
+		de_sprint.grades g
+	JOIN de_sprint.employees e ON
+		e.id = g.employee_id
+	WHERE
+		e.department_id = d.id
+		AND grade = 'E'
+	) e_count,
+	-- xvii.     Средний показатель коэффициента премии
+	(
+	SELECT
+		avg(g.bonus_score)
+	FROM
+		grade_aux g
+	JOIN employees_aux e ON
+		e.id = g.employee_id
+	WHERE
+		e.department_id = d.id
+	) avg_bonus_score,
+	-- xviii.     Общий размер премии.
+	(
+	SELECT
+		sum(salary * g.bonus_score)
+	FROM
+		grade_aux g
+	JOIN employees_aux e ON
+		e.id = g.employee_id
+	WHERE
+		e.department_id = d.id
+	) bonus_total,
+	-- xix.     Общую сумму зарплат(+ премии) до индексации
+	(
+	SELECT
+		sum(salary) + sum(salary * bonus_score)
+	FROM
+		employees_aux e
+	WHERE
+		e.department_id = d.id
+	GROUP BY
+		e.department_id) salary_plus_bonus_total,
+	-- xx.     Общую сумму зарплат(+ премии) после индексации(премии не индексируются)
+	(
+	SELECT
+		sum(salary_indexed) + sum(salary * bonus_score)
+	FROM
+		employees_aux e
+	WHERE
+		e.department_id = d.id
+	GROUP BY
+		e.department_id) salary_indexed_plus_bonus_total,
+	-- xxi.     Разницу в % между предыдущими двумя суммами(первая/вторая)
+	(
+	SELECT
+		(sum(salary) + sum(salary * bonus_score)) / (sum(salary_indexed) + sum(salary * bonus_score))
+	FROM
+		employees_aux e
+	WHERE
+		e.department_id = d.id
+	GROUP BY
+		e.department_id) percent_difference
+FROM
+	de_sprint.departments d;
+
+
+
+
 
 
 
