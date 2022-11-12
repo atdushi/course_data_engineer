@@ -29,10 +29,11 @@ object Utils {
     result
   }
 
-  def indexSalary(salaries: List[Int], inflation: Float): List[Double] = {
-    var result = List[Double]()
+  def indexSalary(salaries: List[Int], multiplier: Float): List[Int] = {
+    var result = List[Int]()
     salaries.foreach(c => {
-      result = result :+ (c + c * inflation)
+      // округлим для красоты
+      result = result :+ (c + c * multiplier).toInt
     })
     result
   }

@@ -3,7 +3,8 @@ package com.example
 import scala.io.StdIn.readLine
 
 object App {
-  case class Employee(salaryGross: Int, bonus: Float, eatBonus: Int)
+
+  case class Employee(salaryGross: Int, bonus: Option[Float], eatBonus: Option[Int])
 
   def main(args: Array[String]): Unit = {
 
@@ -26,6 +27,16 @@ object App {
     taskG(salaries)
 
     salaries = taskH(salaries)
+
+    // Версия Pro
+
+    taskI(List(100, 150, 200, 80, 120, 75))
+
+    val deanonymized = taskK()
+
+    taskL(deanonymized)
+
+    taskM(deanonymized)
   }
 
   /*
@@ -58,7 +69,11 @@ object App {
 
     println(s"Ежемесячный оклад сотрудника после вычета налогов: ${Utils.computeSalaryNet(salaryGross, bonus, eatBonus)}")
 
-    val employee = Employee(salaryGross, bonus, eatBonus)
+    val employee = Employee(
+      salaryGross = salaryGross,
+      bonus = Option(bonus),
+      eatBonus = Option(eatBonus)
+    )
     employee
   }
 
@@ -82,7 +97,7 @@ object App {
     Добавьте его зарплату в список и вычислите значение самой высокой зарплаты и самой низкой.
    */
   def taskD(salaryGross: Int, salaries: List[Int]): List[Int] = {
-    val salary = salaryGross + Utils.computeDeviation(salaryGross,salaries)
+    val salary = salaryGross + Utils.computeDeviation(salaryGross, salaries)
     val result = salaries :+ salary
 
     println(s"Новые зарплаты сотрудников: ${result.mkString(", ")}")
@@ -149,15 +164,108 @@ object App {
     println(s"Старая зарплата: ${salaries.mkString(", ")}")
 
     val inflation = 0.07f
-    var result: List[Int] = Nil
-
-    // округлим для красоты
-    for (elem <- Utils.indexSalary(salaries, inflation)) {
-      result = result :+ elem.round.toInt
-    }
+    val result: List[Int] = Utils.indexSalary(salaries, inflation)
 
     println(s"Проиндексированная зарплата: ${result.mkString(", ")}")
 
     result
+  }
+
+  /*
+   i. *Ваши сотрудники остались недовольны и просят индексацию на уровень рынка.
+   Попробуйте повторить ту же операцию, как и в предыдущем задании,
+   но теперь вам нужно проиндексировать зарплаты на процент отклонения
+   от среднего по рынку с учетом уровня специалиста.
+   На вход вашей программе подается 3 значения – среднее значение зарплаты на рынке
+   для каждого уровня специалистов(junior, middle и senior)
+   */
+  def taskI(salaries: List[Int]): Unit = {
+
+    case class MarketSalary(average: Int, min: Int, max: Int, level: String)
+
+    def computeDiff(avgSalaryByMarket: Int, salaries: List[Int]): Float = {
+      val avgMiddleSalary = salaries.sum / salaries.size
+      val avgMiddleSalaryDiff = 1 - avgMiddleSalary / avgSalaryByMarket.toFloat
+      avgMiddleSalaryDiff
+    }
+
+    val marketSalaries: List[MarketSalary] = List(
+      MarketSalary(150, 49, 100, "junior"),
+      MarketSalary(175, 99, 200, "middle"),
+      MarketSalary(220, 180, 250, "senior"))
+
+    for (marketSalary <- marketSalaries) {
+      val fork: List[Int] = Utils.computeFork(salaries, marketSalary.min, marketSalary.max)
+      val avgSalaryDiff = computeDiff(marketSalary.average, fork)
+      val newSalaries: List[Int] = Utils.indexSalary(fork, avgSalaryDiff)
+      println(s"Проиндексированные на уровень рынка зарплаты ${marketSalary.level}: ${newSalaries.mkString(", ")}")
+    }
+  }
+
+  /*
+   j. ****(для тех, кто любит хардкор) Попробуйте самостоятельно вычислить средние значения
+   уровня зарплат для data engineer’ов каждого уровня с помощью, например,  https://dev.hh.ru/.
+   */
+  def taskJ(): Unit = {
+
+  }
+
+  /*
+     k. *Попробуйте деанонимизировать ваших сотрудников –
+     составьте структуру, которая позволит иметь знания о том,
+     сколько зарабатывает каждый сотрудник(Фамилия и имя).
+  */
+  def taskK(): Map[String, Int] = {
+    val workerSalaryMap = Map(
+      "Сафонова Алина" -> 110,
+      "Антонов Евгений" -> 50,
+      "Седов Антон" -> 80
+    )
+
+    workerSalaryMap
+  }
+
+
+  /*
+    l. *Выведите фамилию и имя сотрудников с самой высокой
+    и самой низкой зарплатой(только не рассказывайте им об этом факте).
+   */
+  def taskL(workerSalaryMap: Map[String, Int]): Unit = {
+    val sorted = workerSalaryMap.toSeq.sortBy(_._2)
+    println(s"Минимальная зарплата у ${sorted.apply(0)._1}")
+    println(s"Максимальная зарплата у ${sorted.apply(sorted.size - 1)._1}")
+  }
+
+  /*
+    m. *Попробуйте запутать тех, кто может случайно наткнуться на эти данные –
+    удалите для каждого сотрудника имя, переведите строку в нижний регистр,
+    удалите гласные и разверните оставшиеся символы справа налево(abc -> cb).
+   */
+  def taskM(workerSalaryMap: Map[String, Int]): Unit = {
+    var result: List[String] = Nil
+
+    workerSalaryMap.foreach(e => {
+      val lastName = e._1.split(" ").apply(0).toLowerCase().replaceAll("[аиеёоуыэюя]", "").reverse
+      result = result :+ lastName
+    })
+
+    println(s"Запутанные сотрудники: ${result.mkString(", ")}")
+  }
+
+
+  /*
+    o. *Попробуйте написать функцию, которая вычисляет значение степени двойки:
+          i. С помощью обычной рекурсии
+   */
+  def taskOi(): Unit = {
+
+  }
+
+  /*
+    o. *Попробуйте написать функцию, которая вычисляет значение степени двойки:
+           ii. **С помощью хвостовой рекурсии
+   */
+  def taskOii(): Unit = {
+
   }
 }
