@@ -1,5 +1,6 @@
 package com.example
 
+import scala.annotation.tailrec
 import scala.io.StdIn.readLine
 
 object App {
@@ -8,35 +9,41 @@ object App {
 
   def main(args: Array[String]): Unit = {
 
-    // Версия Lite
+    //    // Версия Lite
+    //
+    //    taskA()
+    //
+    //    var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
+    //
+    //    val employee = taskB()
+    //
+    //    taskC(employee, salaries)
+    //
+    //    salaries = taskD(employee.salaryGross, salaries)
+    //
+    //    salaries = taskE(salaries)
+    //
+    //    salaries = taskF(salaries)
+    //
+    //    taskG(salaries)
+    //
+    //    salaries = taskH(salaries)
+    //
+    //    // Версия Pro
+    //
+    //    taskI(List(100, 150, 200, 80, 120, 75))
+    //
+    //    val deanonymized = taskK()
+    //
+    //    taskL(deanonymized)
+    //
+    //    taskM(deanonymized)
 
-    taskA()
+    val power = 4
 
-    var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
+    taskOi(power)
 
-    val employee = taskB()
-
-    taskC(employee, salaries)
-
-    salaries = taskD(employee.salaryGross, salaries)
-
-    salaries = taskE(salaries)
-
-    salaries = taskF(salaries)
-
-    taskG(salaries)
-
-    salaries = taskH(salaries)
-
-    // Версия Pro
-
-    taskI(List(100, 150, 200, 80, 120, 75))
-
-    val deanonymized = taskK()
-
-    taskL(deanonymized)
-
-    taskM(deanonymized)
+    taskOii(power)
   }
 
   /*
@@ -183,11 +190,6 @@ object App {
 
     case class MarketSalary(average: Int, min: Int, max: Int, level: String)
 
-    def computeDiff(avgSalaryByMarket: Int, salaries: List[Int]): Float = {
-      val avgMiddleSalary = salaries.sum / salaries.size
-      val avgMiddleSalaryDiff = 1 - avgMiddleSalary / avgSalaryByMarket.toFloat
-      avgMiddleSalaryDiff
-    }
 
     val marketSalaries: List[MarketSalary] = List(
       MarketSalary(150, 49, 100, "junior"),
@@ -196,7 +198,7 @@ object App {
 
     for (marketSalary <- marketSalaries) {
       val fork: List[Int] = Utils.computeFork(salaries, marketSalary.min, marketSalary.max)
-      val avgSalaryDiff = computeDiff(marketSalary.average, fork)
+      val avgSalaryDiff = Utils.computeDiff(marketSalary.average, fork)
       val newSalaries: List[Int] = Utils.indexSalary(fork, avgSalaryDiff)
       println(s"Проиндексированные на уровень рынка зарплаты ${marketSalary.level}: ${newSalaries.mkString(", ")}")
     }
@@ -257,15 +259,31 @@ object App {
     o. *Попробуйте написать функцию, которая вычисляет значение степени двойки:
           i. С помощью обычной рекурсии
    */
-  def taskOi(): Unit = {
+  def taskOi(power: Int): Unit = {
+    def powerOfTwo(power: Int): Int = {
+      if (power == 0) 1
+      else 2 * powerOfTwo(power - 1)
+    }
 
+    println(s"2^$power = ${powerOfTwo(power)}")
   }
 
   /*
     o. *Попробуйте написать функцию, которая вычисляет значение степени двойки:
            ii. **С помощью хвостовой рекурсии
    */
-  def taskOii(): Unit = {
+  def taskOii(power: Int): Unit = {
 
+    def powerOfTwoTail(power: Int): Int = {
+      @tailrec
+      def loop(power: Int, acc: Int = 1): Int = {
+        if (power == 0) acc
+        else loop(power - 1, 2 * acc)
+      }
+
+      loop(power)
+    }
+
+    println(s"2^$power = ${powerOfTwoTail(power)}")
   }
 }
