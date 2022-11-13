@@ -33,6 +33,8 @@ object App {
 
     taskI(List(100, 150, 200, 80, 120, 75))
 
+    taskJ()
+
     val deanonymized = taskK()
 
     taskL(deanonymized)
@@ -190,7 +192,6 @@ object App {
 
     case class MarketSalary(average: Int, min: Int, max: Int, level: String)
 
-
     val marketSalaries: List[MarketSalary] = List(
       MarketSalary(150, 49, 100, "junior"),
       MarketSalary(175, 99, 200, "middle"),
@@ -209,7 +210,13 @@ object App {
    уровня зарплат для data engineer’ов каждого уровня с помощью, например,  https://dev.hh.ru/.
    */
   def taskJ(): Unit = {
+    val list = List("junior", "middle", "senior", "lead")
 
+    for (item <- list) {
+      val middleSalary = Utils.getHhAvgSalary(item).toInt
+
+      println(s"api.hh.ru средняя зарплата для $item: $middleSalary")
+    }
   }
 
   /*
@@ -227,15 +234,14 @@ object App {
     workerSalaryMap
   }
 
-
   /*
     l. *Выведите фамилию и имя сотрудников с самой высокой
     и самой низкой зарплатой(только не рассказывайте им об этом факте).
    */
   def taskL(workerSalaryMap: Map[String, Int]): Unit = {
     val sorted = workerSalaryMap.toSeq.sortBy(_._2)
-    println(s"Минимальная зарплата у ${sorted.apply(0)._1}")
-    println(s"Максимальная зарплата у ${sorted.apply(sorted.size - 1)._1}")
+    println(s"Минимальная зарплата у ${sorted.head._1}")
+    println(s"Максимальная зарплата у ${sorted.last._1}")
   }
 
   /*
@@ -253,7 +259,6 @@ object App {
 
     println(s"Запутанные сотрудники: ${result.mkString(", ")}")
   }
-
 
   /*
     o. *Попробуйте написать функцию, которая вычисляет значение степени двойки:
