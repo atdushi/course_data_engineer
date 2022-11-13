@@ -9,35 +9,35 @@ object App {
 
   def main(args: Array[String]): Unit = {
 
-    //    // Версия Lite
-    //
-    //    taskA()
-    //
-    //    var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
-    //
-    //    val employee = taskB()
-    //
-    //    taskC(employee, salaries)
-    //
-    //    salaries = taskD(employee.salaryGross, salaries)
-    //
-    //    salaries = taskE(salaries)
-    //
-    //    salaries = taskF(salaries)
-    //
-    //    taskG(salaries)
-    //
-    //    salaries = taskH(salaries)
-    //
-    //    // Версия Pro
-    //
-    //    taskI(List(100, 150, 200, 80, 120, 75))
-    //
-    //    val deanonymized = taskK()
-    //
-    //    taskL(deanonymized)
-    //
-    //    taskM(deanonymized)
+    // Версия Lite
+
+    taskA()
+
+    var salaries: List[Int] = List(100, 150, 200, 80, 120, 75)
+
+    val employee = taskB()
+
+    taskC(employee, salaries)
+
+    salaries = taskD(employee.salaryGross, salaries)
+
+    salaries = taskE(salaries)
+
+    salaries = taskF(salaries)
+
+    taskG(salaries)
+
+    salaries = taskH(salaries)
+
+    // Версия Pro
+
+    taskI(List(100, 150, 200, 80, 120, 75))
+
+    val deanonymized = taskK()
+
+    taskL(deanonymized)
+
+    taskM(deanonymized)
 
     val power = 4
 
