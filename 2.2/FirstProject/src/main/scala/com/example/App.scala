@@ -31,7 +31,7 @@ object App {
 
     // Версия Pro
 
-    taskI(List(100, 150, 200, 80, 120, 75))
+    taskI(salaries)
 
     taskJ()
 
@@ -265,12 +265,7 @@ object App {
           i. С помощью обычной рекурсии
    */
   def taskOi(power: Int): Unit = {
-    def powerOfTwo(power: Int): Int = {
-      if (power == 0) 1
-      else 2 * powerOfTwo(power - 1)
-    }
-
-    println(s"2^$power = ${powerOfTwo(power)}")
+    taskO(new RecursionCalculator, power)
   }
 
   /*
@@ -278,17 +273,10 @@ object App {
            ii. **С помощью хвостовой рекурсии
    */
   def taskOii(power: Int): Unit = {
+    taskO(new TailRecursionCalculator, power)
+  }
 
-    def powerOfTwoTail(power: Int): Int = {
-      @tailrec
-      def loop(power: Int, acc: Int = 1): Int = {
-        if (power == 0) acc
-        else loop(power - 1, 2 * acc)
-      }
-
-      loop(power)
-    }
-
-    println(s"2^$power = ${powerOfTwoTail(power)}")
+  def taskO(calculator: PowerOfTwoCalculator, power: Int): Unit = {
+    println(s"${calculator.toString}: 2^$power = ${calculator.calculate(power)}")
   }
 }
