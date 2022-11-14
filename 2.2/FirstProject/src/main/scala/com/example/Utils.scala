@@ -4,6 +4,8 @@ import net.liftweb.json
 import net.liftweb.json.DefaultFormats
 import scalaj.http._
 
+import scala.language.implicitConversions
+
 object Utils {
   /*
     Зарплата после вычета налога
@@ -18,7 +20,7 @@ object Utils {
    */
   def computeDeviationPercent(salaryGross: Int, salaries: List[Int]): Double = {
     val middleSalary = salaries.sum / salaries.length
-    var deviation: Double = 100 - (100 * salaryGross / middleSalary)
+    val deviation: Double = 100 - (100 * salaryGross / middleSalary)
     -deviation / 100
   }
 
@@ -67,12 +69,19 @@ object Utils {
   }
 
   def getHhAvgSalary(level: String): Float = {
+    object Currencies extends Enumeration {
+      val RUR, USD, EUR = Value
+    }
+    import Currencies._
+
+    val exchangeRates = Map(
+      RUR -> 1,
+      USD -> 62,
+      EUR -> 62
+    )
+
     case class salary(from: String, to: String, currency: String, gross: Boolean)
-
     case class vacancy(name: String, salary: salary)
-
-    val usdExchangeRate = 62
-    val eurExchangeRate = 62
 
     val response: HttpResponse[String] = Http("https://api.hh.ru/vacancies")
       .param("text", s"name:\"$level data engineer\"")
@@ -80,20 +89,22 @@ object Utils {
       .param("area", "1") // 1 - мск, 2 - спб, 113 - россия
       .asString
 
-    implicit val formats = DefaultFormats
+    implicit val formats: DefaultFormats.type = DefaultFormats
 
     val jValue = json.parse(response.body)
 
     val vacancies = (jValue \ "items").extract[List[vacancy]]
 
     var result: List[Int] = Nil
+
+    implicit def stringToCurrency(currency: String): Value = Currencies.values.find(_.toString == currency).get
+
     for (vac <- vacancies) {
       var sal: Int = if (vac.salary.from != null) vac.salary.from.toInt else vac.salary.to.toInt
-      //RUR рубли
-      if (vac.salary.currency == "USD") sal = sal * usdExchangeRate
-      if (vac.salary.currency == "EUR") sal = sal * eurExchangeRate
+      sal = sal * exchangeRates(vac.salary.currency)
       result = result :+ sal
     }
+
     val middleSalary = result.sum / result.length
     middleSalary
   }
