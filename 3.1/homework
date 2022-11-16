@@ -1,3 +1,4 @@
+-----------------------------------------------для VirtualBox----------------------------------
 # Virtualbox shared folder permissions
 sudo usermod -aG vboxsf cloudera
 
@@ -41,4 +42,26 @@ hadoop fs -du -h /user/cloudera/voyna-i-mir.txt
 hadoop fs -cat /user/cloudera/voyna-i-mir.txt | wc -w
 131299
 
+-----------------------------------------------для docker контейнеров----------------------------------
+docker ps
+CONTAINER ID   IMAGE                                             COMMAND                  CREATED          STATUS                    PORTS                                                      NAMES
+63a3ccbfc6b3   bde2020/spark-worker:2.1.0-hadoop2.8-hive-java8   "entrypoint.sh /bin/…"   30 minutes ago   Up 30 minutes (healthy)   0.0.0.0:8081->8081/tcp                                     docker-hadoop-spark-workbench-spark-worker-1
+7dbef43aa8b0   bde2020/hadoop-datanode:1.1.0-hadoop2.8-java8     "/entrypoint.sh /run…"   30 minutes ago   Up 30 minutes (healthy)   0.0.0.0:50075->50075/tcp                                   docker-hadoop-spark-workbench-datanode-1
+041db64c2705   bde2020/spark-notebook:2.1.0-hadoop2.8-hive       "/entrypoint.sh /run…"   30 minutes ago   Up 30 minutes             0.0.0.0:9001->9001/tcp                                     spark-notebook
+78cf47180e7c   bde2020/hadoop-namenode:1.1.0-hadoop2.8-java8     "/entrypoint.sh /run…"   30 minutes ago   Up 30 minutes (healthy)   0.0.0.0:50070->50070/tcp                                   namenode
+30019988410e   bde2020/spark-master:2.1.0-hadoop2.8-hive-java8   "entrypoint.sh /bin/…"   30 minutes ago   Up 30 minutes (healthy)   0.0.0.0:7077->7077/tcp, 6066/tcp, 0.0.0.0:8080->8080/tcp   spark-master
+26ebaf6bc7fb   bde2020/hdfs-filebrowser:3.11                     "/entrypoint.sh buil…"   30 minutes ago   Up 30 minutes             0.0.0.0:8088->8088/tcp                                     docker-hadoop-spark-workbench-hue-1
 
+docker cp ~/Downloads/voyna-i-mir-tom-1.txt 7dbef:/
+docker cp ~/Downloads/voyna-i-mir-tom-2.txt 7dbef:/
+docker cp ~/Downloads/voyna-i-mir-tom-3.txt 7dbef:/
+docker cp ~/Downloads/voyna-i-mir-tom-4.txt 7dbef:/
+
+docker exec -it 7dbef bash
+
+hadoop fs -copyFromLocal voyna-i-mir-tom-1.txt /user/cloudera
+hadoop fs -copyFromLocal voyna-i-mir-tom-2.txt /user/cloudera
+hadoop fs -copyFromLocal voyna-i-mir-tom-3.txt /user/cloudera
+hadoop fs -copyFromLocal voyna-i-mir-tom-4.txt /user/cloudera
+
+дальше всё то же самое...
