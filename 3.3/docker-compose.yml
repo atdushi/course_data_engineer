@@ -13,3 +13,9 @@ services:
             - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}			
         restart: always
 
+    adminer:
+        image: adminer
+        ports:
+            - "8080:8080"
+        restart: always
+
