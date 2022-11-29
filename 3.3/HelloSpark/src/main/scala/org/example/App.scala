@@ -40,12 +40,19 @@ object App {
       .withColumn("event_time", from_unixtime(col("timestamp")))
       .drop("timestamp")
 
+    // всего посещений
     df_web = df_web.withColumn("total_visit_count",
       count(col("id")).over(Window.partitionBy("id")))
 
+    // дата последнего посещения
+    df_web = df_web.withColumn("max_event_time",
+      max(col("event_time")).over(Window.partitionBy("id")))
+
+    // посещения страниц
     df_web = df_web.withColumn("page_visit_count",
       count(col("id")).over(Window.partitionBy("id", "page_id")))
 
+    // посещения тем
     df_web = df_web.withColumn("tag_visit_count",
       count(col("id")).over(Window.partitionBy("id", "tag")))
       .withColumn("max_tag_visit_count",
@@ -83,14 +90,25 @@ object App {
     //    которые происходили подряд с разницей не более 5 минут).
     //    10. Среднее кол - во активностей в рамках одной сессии
 
-    val df_all = df_web.alias("web").join(
+    var df_all = df_web.alias("web").join(
       df_lk.alias("lk"),
       col("lk.user_id") === col("web.id"),
       "outer")
 
-    df_all.select("web.id", "lk.age", "lk.gender").show()
+    df_all = df_all.withColumn("raznica", datediff(col("max_event_time"), col("lk.created_at")))
+
+    df_all.select(
+      "web.id",
+      "lk.age",
+
+      "lk.gender",
+
+      "lk.id",
+      "raznica",
+      "web.total_visit_count"
 
 
+    ).distinct().show()
   }
 
   def test(): Unit = {
