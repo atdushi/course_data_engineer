@@ -1,7 +1,7 @@
 package org.example
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{col, count, current_date, datediff, from_unixtime, max, to_date, udf, year}
+import org.apache.spark.sql.functions.{col, count, current_date, datediff, from_unixtime, max, to_date, udf, when, year}
 import org.apache.spark.sql.expressions.Window
 
 import java.util.Properties
@@ -57,6 +57,12 @@ object App {
       count(col("id")).over(Window.partitionBy("id", "tag")))
       .withColumn("max_tag_visit_count",
         max(col("tag_visit_count")).over(Window.partitionBy("id")))
+      .withColumn("ft",
+        when(col("max_tag_visit_count") === col("tag_visit_count"), col("tag"))
+          .otherwise(null))
+      .withColumn("favourite_tag",
+        max(col("ft")).over(Window.partitionBy("id")))
+      .drop("ft", "tag_visit_count", "max_tag_visit_count")
 
 //    df_web.show()
 
@@ -100,9 +106,8 @@ object App {
     df_all.select(
       "web.id",
       "lk.age",
-
       "lk.gender",
-
+      "web.favourite_tag",
       "lk.id",
       "raznica",
       "web.total_visit_count"
