@@ -1,8 +1,9 @@
 package org.example
 
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.functions.{col, count, current_date, datediff, from_unixtime, max, to_date, udf, when, year}
 import org.apache.spark.sql.expressions.Window
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.DecimalType
 
 import java.util.Properties
 
@@ -11,7 +12,7 @@ object App {
     val spark = SparkSession.builder()
       .master("local[1]")
       .appName("SparkByExample")
-      .getOrCreate();
+      .getOrCreate()
 
     spark.sparkContext.setLogLevel("ERROR")
 
@@ -38,7 +39,6 @@ object App {
 
     df_web = df_web
       .withColumn("event_time", from_unixtime(col("timestamp")))
-      .drop("timestamp")
 
     // всего посещений
     df_web = df_web.withColumn("total_visit_count",
@@ -64,7 +64,18 @@ object App {
         max(col("ft")).over(Window.partitionBy("id")))
       .drop("ft", "tag_visit_count", "max_tag_visit_count")
 
-//    df_web.show()
+    // длина между событиями
+    val windowSpec = Window.partitionBy("id").orderBy("event_time")
+    df_web = df_web
+      .withColumn("prev_date", lag(col("timestamp"), 1, 0).over(windowSpec))
+      .withColumn("event_diff_minutes",
+        when(col("prev_date") === 0, 0)
+          .otherwise(((col("timestamp") - col("prev_date")) / 60).cast(DecimalType(10, 0))))
+      .withColumn("avg_event_diff_minutes",
+        avg(col("event_diff_minutes")).over(Window.partitionBy("id")).cast(DecimalType(10, 0)))
+      .drop("timestamp", "prev_date")
+
+    //    df_web.show()
 
     val connectionProperties = new Properties()
     connectionProperties.put("user", "postgres")
@@ -101,18 +112,22 @@ object App {
       col("lk.user_id") === col("web.id"),
       "outer")
 
-    df_all = df_all.withColumn("raznica", datediff(col("max_event_time"), col("lk.created_at")))
+    df_all = df_all.withColumn("raznica",
+      when(col("lk.created_at").isNull, -1)
+        .otherwise(datediff(col("max_event_time"), col("lk.created_at"))))
+
+    //    df_all.show()
 
     df_all.select(
-      "web.id",
-      "lk.age",
-      "lk.gender",
-      "web.favourite_tag",
-      "lk.id",
-      "raznica",
-      "web.total_visit_count"
-
-
+      col("web.id"),
+      col("lk.age"),
+      col("lk.gender"),
+      col("web.favourite_tag"),
+      col("lk.id"),
+      col("raznica"),
+      col("web.total_visit_count"),
+      col("web.avg_event_diff_minutes"), // средняя длина между событиями
+      lit(1).alias("event_count") // одно событие в сессии
     ).distinct().show()
   }
 
