@@ -129,6 +129,7 @@ def add_column():
     conn.close()
 
 
+#0 0 * * *
 with DAG(dag_id="second_dag", start_date=datetime(2022, 1, 1), schedule="*/5 * * * *", catchup=False) as dag:
     bash_task = BashOperator(task_id="hello", bash_command="echo hello", do_xcom_push=False)
     python_task = PythonOperator(task_id="world", python_callable=hello, do_xcom_push=False)
