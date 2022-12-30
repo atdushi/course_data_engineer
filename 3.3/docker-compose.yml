@@ -1,0 +1,21 @@
+services:
+    postgres_service:
+        container_name: postgres_14
+        image: postgres:14.2
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+            #- ./pg_data:/var/lib/postgresql/data/
+        env_file:
+            - .env
+        environment:
+            - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}			
+        restart: always
+
+    adminer:
+        image: adminer
+        ports:
+            - "8080:8080"
+        restart: always
+
